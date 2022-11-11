@@ -110,18 +110,23 @@ class Client:
             prt_str = "fail to download data from {}".format(url)
             logging.debug(prt_str)
             return prt_str
-        ret_traj = self.data_parse(r.text)
-        datapath = self.opt.datadir + "/{}/".format(fltNo)
-        if not os.path.exists(datapath):
-            os.makedirs(datapath)
-        with open(os.path.join(datapath, "{}-{}.txt".format(cur_date, tag)), 'w', encoding='utf-8') as fw:
-            fw.write("# {}\n".format(url))
-            fw.write("cst\tlat\tlon\thdg\tknot\tkph\talt\troc\n")
-            for traj in ret_traj:
-                fw.write('\t'.join(traj) + "\n")
-        prt_str = "sucessfully download data from {}".format(url)
-        logging.debug(prt_str)
-        return prt_str
+        try:
+            ret_traj = self.data_parse(r.text)
+            datapath = self.opt.datadir + "/{}/".format(fltNo)
+            if not os.path.exists(datapath):
+                os.makedirs(datapath)
+            with open(os.path.join(datapath, "{}-{}.txt".format(cur_date, tag)), 'w', encoding='utf-8') as fw:
+                fw.write("# {}\n".format(url))
+                fw.write("cst\tlat\tlon\thdg\tknot\tkph\talt\troc\n")
+                for traj in ret_traj:
+                    fw.write('\t'.join(traj) + "\n")
+            prt_str = "sucessfully download data from {}".format(url)
+            logging.debug(prt_str)
+            return prt_str
+        except Exception as e:
+            prt_str = "fail to download data from {}".format(url) + '\n' + str(e)
+            logging.debug(prt_str)
+            return prt_str
 
     def run(self, start_from=None):
         flts = self.fetch_fltNo()
