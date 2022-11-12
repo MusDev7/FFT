@@ -49,21 +49,28 @@ class Client:
     def fetch_query_url(self, flt):
         url = 'https://zh.flightaware.com/live/flight/{}/history'.format(flt)
         querys = []
-        try:
-            r = requests.get(url=url, headers=self.headers)
-            r.encoding = 'utf-8'
-            ret_text = r.text
-            links = ret_text.split('data-target')[1:]
-            for t in links:
-                if ("已排班" in t) or ("已取消" in t) or ("在途中" in t):
-                    continue
-                link = t.split("'")[1]
-                date = link.split('/')[5]
-                tag = link.split('/')[6]
-                intact_url = 'https://zh.flightaware.com/' + link + "/tracklog"
-                querys.append([intact_url, flt, date, tag])
-        except Exception as e:
-            pass
+        for i in range(self.opt.retran+1):
+            try:
+                r = requests.get(url=url, headers=self.headers, timeout=self.opt.timeout)
+                r.encoding = 'utf-8'
+                ret_text = r.text
+                links = ret_text.split('data-target')[1:]
+                for t in links:
+                    if ("已排班" in t) or ("已取消" in t) or ("在途中" in t):
+                        continue
+                    link = t.split("'")[1]
+                    date = link.split('/')[5]
+                    tag = link.split('/')[6]
+                    intact_url = 'https://zh.flightaware.com/' + link + "/tracklog"
+                    querys.append([intact_url, flt, date, tag])
+                break
+            except Exception as e:
+                if i == self.opt.retran:
+                    prt_str = f"fail to fetch {flt} history"
+                    print(prt_str)
+                    logging.debug(prt_str + '\n' + str(e))
+                print(f"fail to fetch data. Will retry({i+1}) soon...")
+                time.sleep(2)
         return querys
 
     def data_parse(self, line):
@@ -112,7 +119,7 @@ class Client:
                     prt_str = "fail to download data from {}".format(url) + '\n' + str(e)
                     logging.debug(prt_str)
                     return prt_str
-                print(f"Fail to fetch data. Will retry({i+1}) soon...")
+                print(f"fail to fetch data. Will retry({i+1}) soon...")
                 time.sleep(10)
         logging.debug("Get successfully")
         r.encoding = 'utf-8'
@@ -149,8 +156,8 @@ class Client:
                 pass
             flts = flts[idx:]
         for flt in flts:
-            start_time = time.perf_counter()
             querys = self.fetch_query_url(flt)
+            start_time = time.perf_counter()
             for i, query in enumerate(querys):
                 prt_str = self.get_data_from_url(query)
                 progress_bar(i, len(querys), prt_str, start_time)
