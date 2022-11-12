@@ -103,7 +103,20 @@ class Client:
 
     def get_data_from_url(self, params):
         url, fltNo, cur_date, tag = params
-        r = requests.get(url=url, headers=self.headers)
+        for i in range(self.opt.retran+1):
+            try:
+                r = requests.get(url=url, headers=self.headers, timeout=self.opt.timeout)
+                break
+            except Exception as e:
+                if i == self.opt.retran:
+                    prt_str = "fail to download data from {}".format(url) + '\n' + str(e)
+                    logging.debug(prt_str)
+                    return prt_str
+                print(f"Fail to fetch data. Will retry({i+1}) soon...")
+                time.sleep(10)
+        prt_str = "Get successfully"
+        logging.debug(prt_str)
+        print(prt_str)
         r.encoding = 'utf-8'
         # print(url)
         if 'Flight date too far in the future' in r.text:
@@ -155,6 +168,8 @@ if __name__ == '__main__':
     parser.add_argument('--fltdir', default='./od_in.txt', type=str)
     parser.add_argument('--datadir', default='./data', type=str)
     parser.add_argument('--logdir', default='./log', type=str)
+    parser.add_argument('--timeout', default='10', type=int)
+    parser.add_argument('--retran', default='5', type=int, comment='max time of retry')
     client = Client(parser.parse_args())
-    client.run('UAL552')
+    client.run()
     # client.get_data_from_url(["https://flightaware.com/live/flight/UAL517/history/20221110/0540Z/KSAN/KEWR/tracklog", "UAL517", "20202020", "13Z"])
