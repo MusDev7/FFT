@@ -31,7 +31,7 @@ class Client:
         self.opt = opt
         self.headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                                      "Chrome/95.0.4638.69 Safari/537.36 Edg/95.0.1020.44"}
-        self.log_path = self.opt.logdir + f'/{datetime.datetime.now().strftime("%y-%m-%d")}'
+        self.log_path = self.opt.logdir + f'/{datetime.datetime.now().strftime("%y-%m-%d-%H")}'
         if not os.path.exists(self.log_path):
             os.makedirs(self.log_path)
         logging.basicConfig(filename=os.path.join(self.log_path, 'run.log'),
