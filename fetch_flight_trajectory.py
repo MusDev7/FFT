@@ -114,9 +114,7 @@ class Client:
                     return prt_str
                 print(f"Fail to fetch data. Will retry({i+1}) soon...")
                 time.sleep(10)
-        prt_str = "Get successfully"
-        logging.debug(prt_str)
-        print(prt_str)
+        logging.debug("Get successfully")
         r.encoding = 'utf-8'
         # print(url)
         if 'Flight date too far in the future' in r.text:
