@@ -169,7 +169,7 @@ if __name__ == '__main__':
     parser.add_argument('--datadir', default='./data', type=str)
     parser.add_argument('--logdir', default='./log', type=str)
     parser.add_argument('--timeout', default='10', type=int)
-    parser.add_argument('--retran', default='5', type=int, comment='max time of retry')
+    parser.add_argument('--retran', default='5', type=int, help='max time of retry')
     client = Client(parser.parse_args())
     client.run()
     # client.get_data_from_url(["https://flightaware.com/live/flight/UAL517/history/20221110/0540Z/KSAN/KEWR/tracklog", "UAL517", "20202020", "13Z"])
