@@ -5,6 +5,7 @@ import re, os
 import datetime, time
 import argparse
 import logging
+import pandas as pd
 
 
 def progress_bar(step, n_step, str, start_time=time.perf_counter(), bar_len=20):
@@ -69,7 +70,7 @@ class Client:
                     prt_str = f"fail to fetch {flt} history"
                     print(prt_str)
                     logging.debug(prt_str + '\n' + str(e))
-                print(f"fail to fetch data. Will retry({i+1}) soon...")
+                print(f"fail to fetch data(urls collecting error). Will retry({i+1}) soon...")
                 time.sleep(2)
         return querys
 
@@ -113,19 +114,21 @@ class Client:
         for i in range(self.opt.retran+1):
             try:
                 r = requests.get(url=url, headers=self.headers, timeout=self.opt.timeout)
-                break
+                r_route = requests.get(url=url[:-8]+'route', headers=self.headers, timeout=self.opt.timeout)
             except Exception as e:
+                print(e)
                 if i == self.opt.retran:
-                    prt_str = "fail to download data from {}".format(url) + '\n' + str(e)
+                    prt_str = "fail to download data from {}(fetching error)".format(url) + '\n' + str(e)
                     logging.debug(prt_str)
                     return prt_str
-                print(f"fail to fetch data. Will retry({i+1}) soon...")
+                print(f"fail to fetch data(fetching error). Will retry({i+1}) soon...")
                 time.sleep(10)
         logging.debug("Get successfully")
         r.encoding = 'utf-8'
+        r_route.encoding = 'utf-8'
         # print(url)
         if 'Flight date too far in the future' in r.text:
-            prt_str = "fail to download data from {}".format(url)
+            prt_str = "fail to download data from {}(Too far)".format(url)
             logging.debug(prt_str)
             return prt_str
         try:
@@ -138,11 +141,19 @@ class Client:
                 fw.write("cst\tlat\tlon\thdg\tknot\tkph\talt\troc\n")
                 for traj in ret_traj:
                     fw.write('\t'.join(traj) + "\n")
+            # route fetching
+            df = pd.read_html(r_route.text, attrs={"class": "prettyTable"})
+            if type(df) == list:
+                df = df[0]
+            df.columns = ['name', 'lat', 'lon', 'Outbound_Course', 'Dis_this_leg', 'Dis_remaining', 'Dis_flown',
+                          'type']
+            df.to_csv(os.path.join(datapath, "{}-{}-ROUTE.txt".format(cur_date, tag)), sep='\t', index=False,
+                      header=True, na_rep='NA')
             prt_str = "sucessfully download data from {}".format(url)
             logging.debug(prt_str)
             return prt_str
         except Exception as e:
-            prt_str = "fail to download data from {}".format(url) + '\n' + str(e)
+            prt_str = "fail to download data from {}(txt processing error)".format(url) + '\n' + str(e)
             logging.debug(prt_str)
             return prt_str
 
