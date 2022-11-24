@@ -115,6 +115,7 @@ class Client:
             try:
                 r = requests.get(url=url, headers=self.headers, timeout=self.opt.timeout)
                 r_route = requests.get(url=url[:-8]+'route', headers=self.headers, timeout=self.opt.timeout)
+                break
             except Exception as e:
                 print(e)
                 if i == self.opt.retran:

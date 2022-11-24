@@ -1,0 +1,5 @@
+name	lat	lon	Outbound_Course	Dis_this_leg	Dis_remaining	Dis_flown	type
+UWLL	54.268333	48.226665	NA	NA	86.0	0.0	Origin Airport
+L	NA	NA	NA	NA	NA	NA	UNKNOWN
+53.54531	NA	NA	NA	NA	NA	NA	UNKNOWN
+47.78116	NA	NA	NA	NA	NA	NA	UNKNOWN

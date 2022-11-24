@@ -1,0 +1,5 @@
+name	lat	lon	Outbound_Course	Dis_this_leg	Dis_remaining	Dis_flown	type
+KMSN	43.1398791	-89.3375045	334°	NA	366.0	0.0	Origin Airport
+ROBBY	44.0757806	-89.9604472	NA	116.0	274.0	116.0	Reporting Point
+KKILR3	NA	NA	NA	NA	NA	NA	UNKNOWN
+KMSP	44.8819722	-93.2217778	NA	NA	0.0	366.0	Destination Airport
