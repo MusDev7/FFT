@@ -22,10 +22,13 @@ def traverse_files(path, draw_pic = False, convert=False, skip_lens = 50):
                 continue
             timestamp, interp_lats, interp_lons, interp_hdgs, interp_kphs, interp_alts, interp_rocs = interpolate(*data[:-2])
             wlines = np.array([timestamp, interp_lats, interp_lons, interp_hdgs, interp_kphs, interp_alts, interp_rocs]).transpose().tolist()
-            store_path = os.path.join('./processed',os.path.split(root)[-1])
-            if not os.path.exists(store_path):
-                os.makedirs(store_path)
-            with open(os.path.join(store_path, 'interp_'+f), 'w') as fr:
+            store_path1 = os.path.join('./processed/notConverted',os.path.split(root)[-1])
+            store_path2 = os.path.join('./processed/converted',os.path.split(root)[-1])
+            if not os.path.exists(store_path1):
+                os.makedirs(store_path1)
+            if not os.path.exists(store_path2):
+                os.makedirs(store_path2)
+            with open(os.path.join(store_path1, 'interp_'+f), 'w') as fr:
                 for line in wlines:
                     time, lat, lon, hdg, kph, alt, roc = line
                     fr.write(f'{(datetime.timedelta(seconds=time)+data[-2]).strftime("%H%M%S")}\t')
@@ -39,7 +42,7 @@ def traverse_files(path, draw_pic = False, convert=False, skip_lens = 50):
                 times, lons, lats, alts, vx, vy, vz = convert_LLAVxyz(timestamp, interp_lats, interp_lons, interp_hdgs,
                                                                       interp_kphs, interp_alts, interp_rocs)
                 wlines = np.array([times, lons, lats, alts, vx, vy, vz]).transpose().tolist()
-                with open(os.path.join(store_path, 'interpConvert_' + f), 'w') as fr:
+                with open(os.path.join(store_path2, 'interpConvert_' + f), 'w') as fr:
                     for line in wlines:
                         time, lon, lat, alt, vx, vy, vz = line
                         fr.write(f'{(datetime.timedelta(seconds=time) + data[-2]).strftime("%H%M%S")}\t')
