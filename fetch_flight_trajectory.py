@@ -96,7 +96,7 @@ class Client:
             alt_m = re.findall(r"\d+\.?\d*", segs[7].split("</span>")[1])  # [0]
             # 8 ROCD
             temp = segs[8].split('&nbsp;')[0].split(">")[-1]
-            rocd = re.findall(r"\d+\.?\d*", temp)
+            rocd = ''.join(re.findall(r"\d+\.?\d*", temp))
             if len(rocd) == 0:
                 rocd = 0
             else:
