@@ -101,9 +101,9 @@ class Client:
                 rocd = 0
             else:
                 if '-' in temp:
-                    rocd = -1 * float(rocd[0])
+                    rocd = -1 * float(rocd)
                 else:
-                    rocd = float(rocd[0])
+                    rocd = float(rocd)
             ret = [datetime, lat, lon, hdg, spd_knot, spd_kmph, alt_m, rocd]
             sl = [str(s) for s in ret]
             ret_traj.append(sl)
