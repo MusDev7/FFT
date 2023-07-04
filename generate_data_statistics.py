@@ -4,9 +4,10 @@ import argparse
 from tqdm import tqdm
 import json
 
-def listdirs(data_path):
-    attr_names = ['lon', 'lat', 'alt', 'spdx', 'spdy', 'spdz']
-    # attr_names = ['lat', 'lon', 'hdg', 'kph', 'alt', 'roc']
+def listdirs(args):
+    data_path = args.datadir
+    # attr_names = ['lon', 'lat', 'alt', 'spdx', 'spdy', 'spdz']
+    attr_names = ['lat', 'lon', 'hdg', 'kph', 'alt', 'roc']
     data = {name:[] for name in attr_names}
     with tqdm(desc=f'Loading files from {data_path}', total=sum(len(files) for _, _, files in os.walk(data_path))) as pbar:
         for root, dirs, files in os.walk(data_path):
@@ -24,12 +25,13 @@ def listdirs(data_path):
                     for i, name in enumerate(attr_names):
                         data[name].append(float(items[i+1]))
             # print(f'{len(files)} files has been loaded')
-    import matplotlib.pyplot as plt
-    for name in attr_names:
-        plt.figure()
-        plt.hist(data[name], bins=1000)
-        plt.title(name)
-    plt.show()
+    if args.show:
+        import matplotlib.pyplot as plt
+        for name in attr_names:
+            plt.figure()
+            plt.hist(data[name], bins=1000)
+            plt.title(name)
+        plt.show()
     # exit()
     return {name:{'max': max(data[name]), 
                   'min': min(data[name]), 
@@ -40,8 +42,9 @@ def listdirs(data_path):
 if __name__ == '__main__':
     parsers = argparse.ArgumentParser()
     parsers.add_argument('--datadir', default='.\data', type=str)
+    parsers.add_argument('--show', action='store_true')
     args = parsers.parse_args()
-    jsoN = listdirs(args.datadir)
+    jsoN = listdirs(args)
     try:
         with open('data_statistics.json', 'r') as f:
             his = json.load(f)
